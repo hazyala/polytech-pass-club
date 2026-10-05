@@ -1,5 +1,7 @@
 # GPT 웹 챗봇
 
+[웹 데모](https://chatbot-project-made-by-hazyala.onrender.com/)
+
 브라우저에서 모델과 API 키를 입력하고 Express가 OpenAI 요청을 중계하는 대화 화면.
 
 ## 요청 흐름
@@ -38,4 +40,4 @@ npm start
 
 `npm run dev`는 nodemon, `npm test`는 실패를 출력하는 placeholder다. 자동 테스트로 안내하지 않는다. 서버 환경변수는 `PORT`를 읽는다. API 키는 화면에서 입력하며 dotenv 자동 로딩은 현재 server에 없다.
 
-기존 배포 주소 기록: https://chatbot-project-made-by-hazyala.onrender.com . 현재 운영 여부는 확인하지 않았으므로 가동 중 demo로 표시하지 않는다.
+배포 주소에서는 시작·모델 선택 화면과 `/verify-key`의 입력 오류 응답을 확인했다. 첫 접속은 지연될 수 있다. 실제 키를 사용하는 모델 응답은 별도 확인이 필요하며, 배포된 버전과 현재 저장소의 중복 listen 문제를 구분한다.
