@@ -1,79 +1,41 @@
-# GPT 웹 애플리케이션
+# GPT 웹 챗봇
 
------
+브라우저에서 모델과 API 키를 입력하고 Express가 OpenAI 요청을 중계하는 대화 화면.
 
-## 📖 프로젝트 소개
+## 요청 흐름
 
-이 프로젝트는 **OpenAI GPT API**를 활용하여 웹 환경에서 동작하는 간단한 **대화형 챗봇 애플리케이션**입니다.
-
-**Node.js (Express)** 기반의 백엔드와 **HTML, CSS, JavaScript**로 구성된 프론트엔드가 결합된 형태로 제작되었습니다. 사용자는 다양한 GPT 모델을 선택하여 대화를 나눌 수 있으며, 직관적인 UI/UX를 통해 자연스러운 채팅 경험을 제공합니다.
-
-🔗 **배포 주소**: [https://chatbot-project-made-by-hazyala.onrender.com](https://chatbot-project-made-by-hazyala.onrender.com)
-
------
-
-## ⚙️ 주요 기능
-
-  - **모델 선택**: 사용자가 GPT-3.5, GPT-4o, GPT-5 등 다양한 GPT 모델을 선택하여 대화할 수 있습니다.
-  - **채팅 인터페이스**: 사용자의 질문을 OpenAI API에 전달하고, 응답을 실시간으로 화면에 표시합니다.
-  - **직관적인 UI/UX**: 반투명한 글래스 디자인, 말풍선 스타일의 채팅 UI, 그리고 반응형 웹 디자인을 적용하여 다양한 기기에서 최적의 경험을 제공합니다.
-
------
-
-## 📂 디렉토리 구조
-
-```
-├── node_modules/         # 프로젝트 의존성 라이브러리
-├── public/               # 정적 리소스
-│   ├── img/              # 이미지 자원
-│   ├── chat.css          # 채팅 페이지 스타일
-│   ├── chat.html         # 채팅 페이지
-│   ├── chat.js           # 채팅 기능 스크립트
-│   ├── index.css         # 인덱스 페이지 스타일
-│   ├── index.html        # 인덱스 페이지 (시작 화면)
-│   └── index.js          # 인덱스 페이지 로직
-├── .gitignore
-├── package.json          # 프로젝트 메타데이터 및 의존성 관리
-├── package-lock.json
-└── server.js             # Express 서버 진입점
+```mermaid
+flowchart LR
+    UI[public/index.js / chat.js] -->|apiKey / model / messages| Server[Express server.js]
+    Server -->|models / chat completions| API[OpenAI API]
+    API --> Server
+    Server -->|JSON| UI
 ```
 
------
+`server.js`는 public 폴더를 정적으로 제공한다. 브라우저의 대화 이력을 request body로 받고 JSON 응답을 돌려준다. 토큰 스트리밍은 없다. package.json에 Redis·session·rate-limit·OpenAI SDK가 선언되어 있지만 현재 server는 Express와 node-fetch를 직접 사용하며 해당 미들웨어를 등록하지 않았다.
 
-## 💻 실행 방법
+## API
 
-### 1\. 로컬 환경에서 실행하기
+| Method | Endpoint | JSON 입력 | 응답 |
+|---|---|---|---|
+| POST | `/verify-key` | apiKey, model | success=true 또는 success=false/message |
+| POST | `/chat` | apiKey, model, messages 배열 | success와 upstream payload, servedModel |
 
-프로젝트를 로컬 환경에서 실행하려면 다음 단계를 순서대로 따라해 주세요.
+verify-key는 OpenAI 모델 목록 요청으로 키를 검사하며 선택 모델의 응답 가능성까지 보증하지 않는다. chat은 `/v1/chat/completions`를 호출하고 upstream 오류 상태를 전달한다. 필수 필드 오류는 400, verify-key upstream 실패는 401, 네트워크 예외는 500이다. 자체 로그인 인증은 없다.
 
-1.  **레포지토리 클론**: 터미널에서 아래 명령어를 입력하여 프로젝트를 로컬로 다운로드합니다.
-    ```bash
-    git clone <레포지토리_URL>
-    cd ChatBot_Project
-    ```
-2.  **의존성 설치**: 프로젝트 디렉토리로 이동한 후, 아래 명령어로 필요한 패키지들을 설치합니다.
-    ```bash
-    npm install
-    ```
-    ```
-3.  **서버 실행**: 다음 명령어를 사용하여 Express 서버를 시작합니다.
-    ```bash
-    node server.js
-    ```
-4.  **웹 애플리케이션 접속**: 서버가 성공적으로 실행되면, 웹 브라우저 (chrome권장) 를 열고 `http://localhost:3000` 주소로 접속하여 애플리케이션을 확인할 수 있습니다.
+기존 README의 “키를 세션에 안전하게 저장” 설명과 달리 서버는 매 요청의 키를 사용한다. 브라우저는 `sessionStorage`에 키와 모델을 보관하고 `public/chat.js`가 요청마다 보낸다. 서버 세션·Redis 저장이 구현된 것으로 소개하지 않는다.
 
------
+## 실행과 현재 장애
 
-### 2\. Render 서버 배포
+package.json의 Node 요구사항은 18 이상이다. 이 폴더에서 의존성을 설치한다.
 
-Render의 무료 플랜은 15분 동안 요청이 없으면 서버가 **Sleep 모드**로 전환됩니다. 이후 재접속 시에는 서버를 다시 깨우는 초기 부팅 시간이 몇 초 발생할 수 있습니다.
+```bash
+npm ci
+npm start
+```
 
------
+현재 `server.js`에 `app.listen(PORT)`가 두 번 있어 그대로 실행하면 포트 중복 오류가 발생할 수 있다. 기본 PORT는 10000이며 기존 README의 3000과 다르다. 문서 정비 범위라 실행 코드는 수정하지 않았다. 정상 실행 명령으로만 소개하지 않고 장애 조건을 함께 남긴다.
 
-🔑 OpenAI API 키 관리
-이 애플리케이션은 보안상의 이유로 OpenAI API 키를 서버 코드에 직접 노출시키지 않습니다. 
-대신, 사용자가 직접 입력한 API 키를 세션에 안전하게 저장하여 API 호출에 사용합니다. 
-이러한 방식은 애플리케이션의 유연성을 높이고, 여러 사용자가 각자의 API 키를 사용하여 서비스를 이용할 수 있도록 합니다.
+`npm run dev`는 nodemon, `npm test`는 실패를 출력하는 placeholder다. 자동 테스트로 안내하지 않는다. 서버 환경변수는 `PORT`를 읽는다. API 키는 화면에서 입력하며 dotenv 자동 로딩은 현재 server에 없다.
 
-
-프로젝트에 대한 궁금한 점이 있다면 언제든지 문의해주세요\! 😊
+기존 배포 주소 기록: https://chatbot-project-made-by-hazyala.onrender.com . 현재 운영 여부는 확인하지 않았으므로 가동 중 demo로 표시하지 않는다.
