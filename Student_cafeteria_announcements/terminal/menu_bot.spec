@@ -1,12 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 
+from PyInstaller.utils.hooks import collect_all
+
+selenium_datas, selenium_binaries, selenium_imports = collect_all('selenium')
+manager_datas, manager_binaries, manager_imports = collect_all('webdriver_manager')
+
 a = Analysis(
     ['menu_bot.py'],
     pathex=[],
-    binaries=[],
-    datas=[],
-    hiddenimports=[],
+    binaries=selenium_binaries + manager_binaries,
+    datas=selenium_datas + manager_datas,
+    hiddenimports=selenium_imports + manager_imports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
