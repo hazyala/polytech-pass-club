@@ -25,7 +25,7 @@ flowchart LR
 
 verify-key는 OpenAI 모델 목록 요청으로 키를 검사하며 선택 모델의 응답 가능성까지 보증하지 않는다. chat은 `/v1/chat/completions`를 호출하고 upstream 오류 상태를 전달한다. 필수 필드 오류는 400, verify-key upstream 실패는 401, 네트워크 예외는 500이다. 자체 로그인 인증은 없다.
 
-기존 README의 “키를 세션에 안전하게 저장” 설명과 달리 서버는 매 요청의 키를 사용한다. 브라우저는 `sessionStorage`에 키와 모델을 보관하고 `public/chat.js`가 요청마다 보낸다. 서버 세션·Redis 저장이 구현된 것으로 소개하지 않는다.
+서버는 매 요청에 포함된 API 키로 모델을 호출한다. 브라우저는 `sessionStorage`에 키와 모델을 보관하고 `public/chat.js`가 요청마다 보낸다. 서버 세션·Redis에는 키를 저장하지 않는다.
 
 ## 실행과 현재 장애
 
@@ -36,7 +36,7 @@ npm ci
 npm start
 ```
 
-현재 `server.js`에 `app.listen(PORT)`가 두 번 있어 그대로 실행하면 포트 중복 오류가 발생할 수 있다. 기본 PORT는 10000이며 기존 README의 3000과 다르다.
+현재 `server.js`에 `app.listen(PORT)`가 두 번 있어 그대로 실행하면 포트 중복 오류가 발생할 수 있다. 기본 PORT는 10000이다.
 
 `npm run dev`는 nodemon, `npm test`는 실패를 출력하는 placeholder다. 자동 테스트로 안내하지 않는다. 서버 환경변수는 `PORT`를 읽는다. API 키는 화면에서 입력하며 dotenv 자동 로딩은 현재 server에 없다.
 
