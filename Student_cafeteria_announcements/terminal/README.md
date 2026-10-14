@@ -2,6 +2,8 @@
 
 Selenium으로 정수캠퍼스 학식 페이지를 열고 BeautifulSoup으로 당일 메뉴를 읽어 출력한다. 날짜·식사 구간을 HTML에서 찾으므로 학교 페이지 구조가 바뀌면 조회가 실패할 수 있다.
 
+![Windows 터미널에서 조회한 평일 중식·석식 메뉴](../../docs/screenshots/cafeteria-cli.png)
+
 ## 실행
 
 **권장: Python 가상환경으로 실행**

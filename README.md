@@ -4,6 +4,12 @@
 
 동아리 활동에서 만든 챗봇, 학식 조회 자동화, C 실습을 모은 저장소.
 
+## 학식 조회 CLI 실행 화면
+
+Windows에서 `menu` 명령을 실행해 정수캠퍼스의 평일 중식·석식 메뉴를 출력한 화면입니다. Selenium으로 학식 페이지를 열고 BeautifulSoup으로 메뉴를 읽습니다. `setup.bat`으로 Python 가상환경을 준비하고 `menu.bat`을 PATH에 등록해 다른 폴더에서도 실행할 수 있도록 구성했습니다. 실행·검증 절차는 [터미널 학식 조회 문서](Student_cafeteria_announcements/terminal/README.md)에 정리했습니다.
+
+![Windows 터미널의 학식 중식·석식 조회 결과](docs/screenshots/cafeteria-cli.png)
+
 ## 프로젝트별 진입점
 
 | 프로젝트 | 구현 | 문서 |
